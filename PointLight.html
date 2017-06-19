@@ -1,0 +1,64 @@
+<html>
+
+<body>
+
+    <script src="three.js"></script>
+    <script src="OrbitControls.js"></script>
+
+    <script>
+
+        var renderer, camera, scene, cube, plane, light, controls;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+      
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+
+        camera.position.set(140,-10,190);
+
+        //Allows zooming and rotating using the mouse.
+        controls = new THREE.OrbitControls(camera);
+
+        //Create a cube to cast the shadow.
+        cube = new THREE.Mesh(new THREE.BoxGeometry(40, 40, 80), new THREE.MeshLambertMaterial({color: 0xCC0000}));
+        cube.position.y = 15;
+        scene.add(cube);
+      
+        //Create a plane perpendicular to z that has the cube's shadow cast onto it.
+        plane = new THREE.Mesh(new THREE.PlaneGeometry(300,200), new THREE.MeshLambertMaterial({color: 0x22FF11}));
+        scene.add(plane);
+
+        //Add axes.  Red is x, green y, blue z.
+        scene.add(new THREE.AxisHelper(110));
+
+        //Add dim uniform background lighting.
+        scene.add( new THREE.AmbientLight(0xffffff, 0.2));
+      
+        //Create a source of directional light.
+        light = new THREE.PointLight(0xffffff, 1);
+        light.position.set(-300,100,40);
+      
+        scene.add(light);
+
+        //Register that shadows are to be cast.
+        renderer.shadowMap.enabled = true;
+
+        //The cube casts the shadow, the plane receives it.
+        light.castShadow = true;
+        cube.castShadow = true;
+        plane.receiveShadow = true;
+
+        render();
+
+        function render()  {      
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+    </script>
+</body>
+
+</html>
